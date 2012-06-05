@@ -9,9 +9,11 @@
 #import <objc/runtime.h>
 
 
-static char AlertViewOriginalDelegateKey;
-static char AlertViewWillDismissBlock;
-static char AlertViewDidDismissBlock;
+// Keys for the associated objects used by the category
+static char AssociatedObjectKeyOriginalDelegate;
+static char AssociatedObjectKeyWillDismissBlock;
+static char AssociatedObjectKeyDidDismissBlock;
+
 
 @implementation UIAlertView (Blocks)
 
@@ -23,22 +25,15 @@ static char AlertViewDidDismissBlock;
 
 - (void)_switchDelegate
 {
-  static BOOL delegateSwitched = NO;
-  if (YES == delegateSwitched)
-  {
-    return;
-  }
-  
   // We save a reference to the original delegate and set ourself as the
   // delegate to receive the delegate callbacks
-  objc_setAssociatedObject(self, &AlertViewOriginalDelegateKey, self.delegate, OBJC_ASSOCIATION_ASSIGN);
+  objc_setAssociatedObject(self, &AssociatedObjectKeyOriginalDelegate, self.delegate, OBJC_ASSOCIATION_ASSIGN);
   [self setDelegate:self];
-  delegateSwitched = YES;
 }
 
 - (id)_originalDelegate
 {
-  return objc_getAssociatedObject(self, &AlertViewOriginalDelegateKey);
+  return objc_getAssociatedObject(self, &AssociatedObjectKeyOriginalDelegate);
 }
 
 
@@ -51,13 +46,13 @@ static char AlertViewDidDismissBlock;
 - (void)setOnWillDismiss:(void (^)(NSUInteger buttonIndex))block
 {
   [self _switchDelegate];
-  objc_setAssociatedObject(self, &AlertViewWillDismissBlock, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
+  objc_setAssociatedObject(self, &AssociatedObjectKeyWillDismissBlock, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 - (void)setOnDidDismiss:(void (^)(NSUInteger buttonIndex))block
 {
   [self _switchDelegate];
-  objc_setAssociatedObject(self, &AlertViewDidDismissBlock, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
+  objc_setAssociatedObject(self, &AssociatedObjectKeyDidDismissBlock, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 
@@ -69,14 +64,15 @@ static char AlertViewDidDismissBlock;
 
 - (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-  void (^block)(NSUInteger buttonIndex) = objc_getAssociatedObject(self, &AlertViewWillDismissBlock);
+  void (^block)(NSUInteger buttonIndex) = objc_getAssociatedObject(self, &AssociatedObjectKeyWillDismissBlock);
   
   if (nil != block)
   {
     block(buttonIndex);
-    objc_setAssociatedObject(self, &AlertViewWillDismissBlock, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(self, &AssociatedObjectKeyWillDismissBlock, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
   }
   
+  // Let's forward the call to the original delegate if it was set
   id delegate = [self _originalDelegate];
   if (YES == [delegate respondsToSelector:@selector(alertView:willDismissWithButtonIndex:)])
   {
@@ -86,14 +82,15 @@ static char AlertViewDidDismissBlock;
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-  void (^block)(NSUInteger buttonIndex) = objc_getAssociatedObject(self, &AlertViewDidDismissBlock);
+  void (^block)(NSUInteger buttonIndex) = objc_getAssociatedObject(self, &AssociatedObjectKeyDidDismissBlock);
   
   if (nil != block)
   {
     block(buttonIndex);
-    objc_setAssociatedObject(self, &AlertViewDidDismissBlock, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(self, &AssociatedObjectKeyDidDismissBlock, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
   }
   
+  // Let's forward the call to the original delegate if it was set
   id delegate = [self _originalDelegate];
   if (YES == [delegate respondsToSelector:@selector(alertView:didDismissWithButtonIndex:)])
   {
