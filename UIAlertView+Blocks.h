@@ -10,7 +10,13 @@
 @interface UIAlertView (Blocks) <UIAlertViewDelegate>
 
 
-/** Set the block to be called the alert view will be dismissed.
+/** Set the block to be called when a button of the alert view is selected.
+ 
+ @param block The block to be called.
+ */
+- (void)setOnDidSelectButton:(void (^)(NSUInteger buttonIndex))block;
+
+/** Set the block to be called when the alert view is about to be dismissed.
  
  @param block The block to be called.
  */

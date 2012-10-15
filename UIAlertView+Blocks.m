@@ -11,6 +11,7 @@
 
 // Keys for the associated objects used by the category
 static char AssociatedObjectKeyOriginalDelegate;
+static char AssociatedObjectKeyDidSelectButtonBlock;
 static char AssociatedObjectKeyWillDismissBlock;
 static char AssociatedObjectKeyDidDismissBlock;
 
@@ -54,6 +55,11 @@ static char AssociatedObjectKeyDidDismissBlock;
 ///--------------------------------------------------
 #pragma mark - Blocks Management
 
+- (void)setOnDidSelectButton:(void (^)(NSUInteger buttonIndex))block
+{
+  [self _setBlock:block withAssociatedObjectKey:&AssociatedObjectKeyDidSelectButtonBlock];
+}
+
 - (void)setOnWillDismiss:(void (^)(NSUInteger buttonIndex))block
 {
   [self _setBlock:block withAssociatedObjectKey:&AssociatedObjectKeyWillDismissBlock];
@@ -70,6 +76,24 @@ static char AssociatedObjectKeyDidDismissBlock;
 /// Alert View Delegate
 ///--------------------------------------------------
 #pragma mark - Alert View Delegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+  void (^block)(NSUInteger buttonIndex) = objc_getAssociatedObject(self, &AssociatedObjectKeyDidSelectButtonBlock);
+  
+  if (nil != block)
+  {
+    block(buttonIndex);
+    objc_setAssociatedObject(self, &AssociatedObjectKeyDidSelectButtonBlock, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+  }
+  
+  // Let's forward the call to the original delegate if it was set
+  id delegate = [self _originalDelegate];
+  if (YES == [delegate respondsToSelector:@selector(alertView:clickedButtonAtIndex:)])
+  {
+    [delegate alertView:alertView clickedButtonAtIndex:buttonIndex];
+  }
+}
 
 - (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex
 {
