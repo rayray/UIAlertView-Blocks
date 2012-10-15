@@ -41,6 +41,12 @@ static char AssociatedObjectKeyDidDismissBlock;
   return objc_getAssociatedObject(self, &AssociatedObjectKeyOriginalDelegate);
 }
 
+- (void)_setBlock:(id)block withAssociatedObjectKey:(char *)key
+{
+  [self _switchDelegate];
+  objc_setAssociatedObject(self, key, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
 
 
 ///--------------------------------------------------
@@ -50,14 +56,12 @@ static char AssociatedObjectKeyDidDismissBlock;
 
 - (void)setOnWillDismiss:(void (^)(NSUInteger buttonIndex))block
 {
-  [self _switchDelegate];
-  objc_setAssociatedObject(self, &AssociatedObjectKeyWillDismissBlock, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
+  [self _setBlock:block withAssociatedObjectKey:&AssociatedObjectKeyWillDismissBlock];
 }
 
 - (void)setOnDidDismiss:(void (^)(NSUInteger buttonIndex))block
 {
-  [self _switchDelegate];
-  objc_setAssociatedObject(self, &AssociatedObjectKeyDidDismissBlock, block, OBJC_ASSOCIATION_COPY_NONATOMIC);
+  [self _setBlock:block withAssociatedObjectKey:&AssociatedObjectKeyDidDismissBlock];
 }
 
 
