@@ -6,8 +6,31 @@ Support for blocks in UIAlertView to replace the use of `UIAlertViewDelegate`.
 Description
 -----------
 
-This simple category adds support to use block callbacks with `UIAlertView`. It doesn't override the use of `UIAlertViewDelegate` since the delegate methods will still be called if a delegate is provided and assuming that they are implemented.
-Currently only 2 blocks are available, the ones that are mostly used: `onWillDismiss` and `onDidDismiss`. Support for other callbacks could be implemented later.
+This simple category adds support to use block callbacks with `UIAlertView`.
+It doesn't override the use of `UIAlertViewDelegate` since the delegate methods will still be called if a delegate is provided and assuming that they are implemented.
+
+Delegate-Block Map
+------------------
+
+<table>
+    <tr>
+        <th>Delegate Method</th>
+        <th>Block Method</th>
+    </tr>
+    <tr>
+        <td>alertView:clickedButtonAtIndex:</td>
+        <td>setOnDidSelectButton:</td>
+    </tr>
+    <tr>
+        <td>alertView:willDismissWithButtonIndex:</td>
+        <td>setOnWillDismiss:</td>
+    </tr>
+    <tr>
+        <td>alertView:didDismissWithButtonIndex:</td>
+        <td>setOnDidDismiss:</td>
+    </tr>
+</table>
+
 
 Usage
 -----
