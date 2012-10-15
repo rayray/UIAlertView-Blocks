@@ -25,6 +25,11 @@ static char AssociatedObjectKeyDidDismissBlock;
 
 - (void)_switchDelegate
 {
+  if (self == self.delegate)
+  {
+    return;
+  }
+  
   // We save a reference to the original delegate and set ourself as the
   // delegate to receive the delegate callbacks
   objc_setAssociatedObject(self, &AssociatedObjectKeyOriginalDelegate, self.delegate, OBJC_ASSOCIATION_ASSIGN);
