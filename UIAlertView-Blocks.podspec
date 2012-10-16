@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license      = 'CCPL'
   s.author       = "Sylvain Guillopé"
   
-  s.source       = { :git => "https://github.com/sguillope/UIAlertView-Blocks.git", :commit => "df14921570a5d9520dde8535443282bc96715980" }
+  s.source       = { :git => "https://github.com/sguillope/UIAlertView-Blocks.git", :tag => "1.0" }
   s.platform     = :ios, '6.0'
   s.source_files = '*.{h,m}'
 end
