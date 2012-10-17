@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "UIAlertView-Blocks"
-  s.version      = "0.0.1"
+  s.version      = "0.1"
   s.summary      = "Support for blocks in UIAlertView to replace the use of UIAlertViewDelegate."
   s.description  = <<-DESC
                       This simple category adds support to use block callbacks with `UIAlertView`.
